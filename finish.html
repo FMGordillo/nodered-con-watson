@@ -1,0 +1,148 @@
+<!-- -1: Tener NodeJs, familiar con terminal, etc... -->
+<!-- 0: https://nodered.org/#get-started (primero LOCAL) -->
+<!-- 0.1: Menu-> Manage Palette -> install -> "node-red-node-watson" -->
+
+<!-- 1: Watson Conversation -->
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>NodeRED Tutorial - IBM Argentina</title>
+    <style>
+        {{{payload.style}}}
+        .spacer {
+            padding-top: 2rem;
+        }
+    </style>
+  <script text="text/javascript">
+    var ws;
+    var loc = window.location;
+    var wsUri = loc.protocol === "https:" ? "wss:" : "ws:";
+
+    wsUri += "//" + loc.host + loc.pathname.replace("tutorial","ws/tutorial");
+
+    function wsConnect() {
+      ws = new WebSocket(wsUri);
+
+      ws.onopen = function() {
+        document.getElementById('status').innerHTML = "conectado 🔗";
+      }
+      ws.onclose = function() {
+        document.getElementById('status').innerHTML = "no conectado 💔";
+        setTimeout(wsConnect, 3000);
+      }
+      ws.onmessage = function(msg) {
+          var response = JSON.parse(msg.data);
+          console.log(response);
+          document.getElementById('conversation-result').innerHTML = JSON.stringify(msg.data);
+          document.getElementById('response').innerHTML = response.output.text;
+      }
+      ws.disconnect = function() {
+        ws.close();
+      }
+    }
+    function sendMessage() {
+        if (ws) {
+            var e = document.getElementById('input-text');
+            ws.send(e.value);
+        }
+    }
+  </script>
+</head>
+<body onload="wsConnect()" onunload="ws.disconnect()">
+    <div class="bx--grid">
+        <div class="spacer"></div>
+        <div class="bx--row">
+            <div class="bx--col">
+
+                <h1>Tutorial</h1>
+                <h2>IBM Cloud, Watson y NodeRED</h2>
+                <br>
+            </div>
+        </div>
+        <div class="spacer"></div>
+        <div class="bx--row">
+            <div class="bx--col-xs-12 bx--col-md-12">
+                <h2>Conversation 💬</h2>
+                <div class="bx--tile">
+                    <div class="bx--row">
+                        <div class="bx--col-xs-12 bx--col-md-4">
+                            <h3>Mensaje</h3>
+                            <input class="bx--text-input" id="input-text" placeholder="Escribí tu mensaje">
+                            <button class="bx--btn bx--btn--primary" onClick="sendMessage()">Enviar mensaje</button>
+                            <p>Estado: <span id="status"></span></p>
+                            <p>Respuesta: <span id="response">no response</span></p>
+                            <br>
+                        </div>
+
+                        <div class="bx--col-xs-12 bx--col-md-4">
+                            <h3>Referencias</h3>
+                            <p>Posibles mensajes para escribir:</p>
+                            <ul class="bx--list--unordered">
+                                <li class="bx--list__item">
+                                    Hello
+                                </li>
+                                <li class="bx--list__item">
+                                    Turn on the lights
+                                </li>
+                                <li class="bx--list__item">
+                                    Turn on the radio
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="bx--col-xs-12 bx--col-md-4">
+                            <h3>Código</h3>
+                            <div class="bx--snippet bx--snippet--code">
+                                <div class="bx--snippet-container">
+                                    <code>
+                                        <pre id="conversation-result">
+                                            no response
+                                        </pre>
+                                    </code>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="spacer"></div>
+        <div class="bx--row">
+            <div class="bx--col-xs-12 bx--col-md-12">
+                <h2>Personality Insights 🙍👱</h2>
+                <div class="bx--tile">
+                    <form action="/personalidad" method="POST">
+                        <div class="bx--form-item">
+                            <label for="text-area" class="bx--label">Texto largo</label>
+                            <textarea name="input-personalidad" id="text-area" class="bx--text-area" rows="4" cols="50" placeholder="Ingrese una biografía, fragmento de texto, o algo significativo para el escritor. Mínimo 200 caracteres."></textarea>
+                        </div>
+                        <div class="bx--form-item">
+                            <button class="bx--btn bx--btn--primary" type="submit">Ver resultado</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="spacer"></div>
+        <div class="bx--row">
+            <div class="bx--col-xs-12 bx--col-md-12">
+                <h2>Natural Language Understanding (NLU) 👅📊</h2>
+                <div class="bx--tile">
+                    <form action="/nlu" method="POST">
+                        <div class="bx--form-item">
+                            <label for="text-area" class="bx--label">Texto largo</label>
+                            <textarea name="input-personalidad" id="text-area" class="bx--text-area" rows="4" cols="50" placeholder="Ingrese otra (o la misma) biografía, fragmento de texto, o algo significativo para el escritor. Mínimo 200 caracteres."></textarea>
+                        </div>
+                        <div class="bx--form-item">
+                            <button class="bx--btn bx--btn--primary" type="submit">Ver resultado</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

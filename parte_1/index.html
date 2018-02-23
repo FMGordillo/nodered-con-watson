@@ -1,0 +1,118 @@
+<!-- PARTE 1  -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>NodeRED Tutorial - IBM Argentina</title>
+    <style>
+    /* No es necesario, pero hace la vida más bella */
+    /* Fuente: http://carbondesignsystem.com/ */
+        {{{payload.style}}}
+        .spacer {
+            padding-top: 2rem;
+        }
+    </style>
+  <script text="text/javascript">
+    /**
+     * Elegí usar WebSockets para tener una respuesta
+     * rápida, como si fuese un chat. Tranquilamente podés usar
+     * un <form>, o mostrar en consola el resultado.
+     * Yo te lo doy en bandeja.
+     */
+    var ws;
+    var loc = window.location;
+
+    /* ¿HTTPS o HTTP? Que te importa, que se encargue el código */
+    var wsUri = loc.protocol === "https:" ? "wss:" : "ws:";
+
+    /* ALERTA: Si no vas a usar /tutorial, cambiá estos valores de abajo */
+    wsUri += "//" + loc.host + loc.pathname.replace("tutorial","ws/tutorial");
+
+    function wsConnect() {
+      ws = new WebSocket(wsUri);
+
+      ws.onopen = function() {
+        document.getElementById('status').innerHTML = "conectado 🔗";
+      }
+      ws.onclose = function() {
+        document.getElementById('status').innerHTML = "no conectado 💔";
+        /* ¿Un timer para "volver a intentarlo"? No sé, lo ví y me copó. */
+        setTimeout(wsConnect, 3000);
+      }
+      ws.onmessage = function(msg) {
+          var response = JSON.parse(msg.data);
+          /* TODO: Mejorar el formateo del JSON */
+          document.getElementById('conversation-result').innerHTML = JSON.stringify(msg.data);
+          document.getElementById('response').innerHTML = response.output.text;
+      }
+      ws.disconnect = function() {
+        ws.close();
+      }
+    }
+  </script>
+</head>
+<!-- ¡¡MUY NECESARIO!! Sino, no funciona los sockets  -->
+<body onload="wsConnect()" onunload="ws.disconnect()">
+    <div class="bx--grid">
+        <div class="spacer"></div>
+        <div class="bx--row">
+            <div class="bx--col">
+                <h1>Tutorial</h1>
+                <h2>IBM Cloud, Watson y NodeRED</h2>
+            </div>
+        </div>
+        <div class="spacer"></div>
+        <div class="bx--row">
+            <div class="bx--col-xs-12 bx--col-md-12">
+                <h2>Conversation 💬</h2>
+                <div class="bx--tile">
+                    <div class="bx--row">
+                        <div class="bx--col-xs-12 bx--col-md-4">
+                            <h3>Mensaje</h3>
+                            <input class="bx--text-input" id="input-text" placeholder="Escribí tu mensaje">
+                            <button class="bx--btn bx--btn--primary" onClick="sendMessage()">Enviar mensaje</button>
+                            <p>Estado: <span id="status"></span></p>
+                            <p>Respuesta: <span id="response">no response</span></p>
+                            <br>
+                        </div>
+
+                        <div class="bx--col-xs-12 bx--col-md-4">
+                            <h3>Referencias</h3>
+                            <p>Posibles mensajes para escribir:</p>
+                            <!-- ALERTA: Sólo válido para el ejemplo Car Dashboard -->
+                            <ul class="bx--list--unordered">
+                                <li class="bx--list__item">
+                                    Hello
+                                </li>
+                                <li class="bx--list__item">
+                                    Turn on the lights
+                                </li>
+                                <li class="bx--list__item">
+                                    Turn on the radio
+                                </li>
+                                <li class="bx--list__item">
+                                    Can I teach you?
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="bx--col-xs-12 bx--col-md-4">
+                            <h3>Código</h3>
+                            <div class="bx--snippet bx--snippet--code">
+                                <div class="bx--snippet-container">
+                                    <code>
+                                        <pre id="conversation-result">
+                                            no response
+                                        </pre>
+                                    </code>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
