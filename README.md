@@ -29,4 +29,4 @@ Por favor leé el archivo [CONTRIBUTING.md](https://www.google.com/) para más i
 
 ## Licencia
 
-Este proyecto está bajo la licencia MIT License - mirá [LICENSE.md](LICENSE.md) para más detalles.
+Este proyecto está bajo la licencia Apache 2.0 - mirá [LICENSE](https://github.com/FMGordillo/nodered-con-watson/blob/master/LICENSE) para más detalles.
